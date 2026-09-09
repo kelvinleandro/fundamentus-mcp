@@ -9,6 +9,7 @@ from app.scrapers.relevant_facts import RelevantFactsScraper
 from app.scrapers.properties import PropertyScraper
 from app.scrapers.security_search import SecuritySearchScraper
 from app.scrapers.advanced_company_search import AdvancedCompanySearchScraper
+from app.scrapers.advanced_fii_search import AdvancedFIISearchScraper
 
 
 def register_page_tools(mcp: FastMCP, settings: Settings) -> None:
@@ -151,6 +152,66 @@ def register_page_tools(mcp: FastMCP, settings: Settings) -> None:
         """
         resources = cast(BrowserResources, ctx.lifespan_context)
         scraper = AdvancedCompanySearchScraper(
+            browser_context=resources["browser_context"],
+            timeout_ms=settings.page_navigation_timeout_ms,
+        )
+        return await scraper.search(filters)
+
+    @mcp.tool
+    async def search_fii_advanced(
+        ctx: Context,
+        filters: AdvancedSearchFilters,
+    ) -> str:
+        """Search FIIs using Fundamentus's advanced filter form.
+
+        Call this tool with one `filters` object, for example:
+
+        ```json
+        {"filters": {"segmento": "6", "negociada": true}}
+        ```
+
+        The `filters` dictionary may contain any combination of the following
+        fields. Omitted fields are left empty. Numeric values must use decimal
+        notation, not percentages: use `0.10` for 10%.
+
+        Range filters accept `*_min` and `*_max` string or numeric values:
+
+        - `ffo_y_min`, `ffo_y_max`: FFO Yield (Funds From Operation Yield).
+        - `divy_min`, `divy_max`: dividend yield as a decimal.
+        - `pvp_min`, `pvp_max`: price-to-book ratio (P/VP).
+        - `mk_cap_min`, `mk_cap_max`: market cap in BRL.
+        - `qtd_imoveis_min`, `qtd_imoveis_max`: number of properties.
+        - `preco_m2_min`, `preco_m2_max`: price per square meter.
+        - `aluguel_m2_min`, `aluguel_m2_max`: rent per square meter.
+        - `cap_rate_min`, `cap_rate_max`: cap rate as a decimal.
+        - `vacancia_min`, `vacancia_max`: weighted vacancy rate as a decimal.
+
+        Select fields:
+
+        - `segmento`: segment code as a string. Valid values are:
+            `"14"` Educacional, `"12"` Escritórios, `"2"` Híbrido,
+            `"3"` Hospital, `"4"` Hotel, `"1"` Indefinido,
+            `"5"` Lajes Corporativas, `"6"` Logística, `"11"` Multicategoria,
+            `"7"` Outros, `"8"` Residencial, `"9"` Shoppings,
+            `"10"` Títulos e Val. Mob., `"13"` Varejo.
+
+        Checkbox fields accept boolean values:
+
+        - `negociada`: require FII shares traded in the last two months.
+
+        Examples:
+
+        ```python
+        {"divy_min": 0.08, "pvp_max": 1.0}
+        {"segmento": "9", "negociada": True}
+        {"cap_rate_min": 0.07, "vacancia_max": 0.10, "segmento": "6"}
+        ```
+
+        The return value is the number of FIIs matching the filters as a
+        string. Unknown field names are rejected.
+        """
+        resources = cast(BrowserResources, ctx.lifespan_context)
+        scraper = AdvancedFIISearchScraper(
             browser_context=resources["browser_context"],
             timeout_ms=settings.page_navigation_timeout_ms,
         )
