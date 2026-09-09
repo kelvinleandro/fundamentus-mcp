@@ -2,7 +2,7 @@
 
 A production-ready [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server providing tools to scrape, search, and analyze Brazilian financial market data (B3 stocks and FIIs) from [Fundamentus](https://www.fundamentus.com.br/).
 
-Built with **Python 3.12+**, **FastMCP**, **Playwright**, and designed to connect to the **Obscura** headless browser (or any Chromium-based browser with CDP enabled).
+Built with **Python 3.12+**, **FastMCP**, **Playwright**, and designed to connect to the [**Obscura**](https://obscura.sh/) headless browser (or any Chromium-based browser with CDP enabled).
 
 ---
 
@@ -68,6 +68,14 @@ The application automatically loads variables from `.env` via `python-dotenv`.
    ```bash
    uv run main.py
    ```
+
+### Testing with MCP Inspector
+
+You can test and inspect the tools interactively in your browser using the official [MCP Inspector](https://github.com/modelcontextprotocol/inspector):
+
+```bash
+npx @modelcontextprotocol/inspector uv run main.py
+```
 
 ### MCP Client Integration (e.g., Claude Desktop, Cursor, Antigravity)
 
