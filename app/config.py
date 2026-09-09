@@ -4,8 +4,6 @@ from urllib.parse import urlparse
 
 from dotenv import load_dotenv
 
-load_dotenv(override=True)
-
 
 @dataclass(frozen=True, slots=True)
 class Settings:
@@ -15,6 +13,7 @@ class Settings:
 
 def load_settings() -> Settings:
     """Load and validate application settings from environment variables."""
+    load_dotenv()
     cdp_url = environ.get("OBSCURA_CDP_URL")
     if not cdp_url:
         raise ValueError("OBSCURA_CDP_URL must be configured")

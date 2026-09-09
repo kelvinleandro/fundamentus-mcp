@@ -31,7 +31,7 @@ def parse_relevant_facts(html: str) -> list[RelevantFact]:
     date_index = find_column(headers, "Data")
     company_index = find_column(headers, "Empresa")
     type_index = find_column(headers, "Tipo")
-    description_index = find_column(headers, "Descricao")
+    description_index = find_column(headers, "Descrição")
     download_index = find_column(headers, "Download")
     analysis_index = find_column(headers, "Analisar")
 

@@ -8,7 +8,7 @@ HTML = """
       <th>Data</th>
       <th>Empresa</th>
       <th>Tipo</th>
-      <th>Descricao</th>
+      <th>Descrição</th>
       <th>Download</th>
       <th>Analisar</th>
     </tr>

@@ -28,3 +28,7 @@ class SecurityMatch(TypedDict):
     ticker: str
     commercial_name: str
     legal_name: str
+
+
+AdvancedSearchValue = str | int | float | bool | None
+AdvancedSearchFilters = dict[str, AdvancedSearchValue]
