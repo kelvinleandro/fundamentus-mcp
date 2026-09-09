@@ -111,6 +111,12 @@ Add this server configuration to your MCP settings file:
 
 Run unit tests without needing an active browser:
 
-```powershell
+```bash
 uv run pytest tests/ -v
 ```
+
+---
+
+## Contributing
+
+Contributions are welcome! Whether it's reporting bugs, suggesting new tools/features, or submitting pull requests, your help is appreciated.
