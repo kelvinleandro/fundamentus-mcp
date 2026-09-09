@@ -10,8 +10,8 @@ class PageScraper:
         self._browser_context = browser_context
         self._timeout_ms = timeout_ms
 
-    async def fetch_title(self) -> str:
-        """Navigate to a page and return its document title."""
+    async def fetch_example_title(self) -> str:
+        """Navigate to the example page and return its document title."""
         page = await self._browser_context.new_page()
         page.set_default_navigation_timeout(self._timeout_ms)
 

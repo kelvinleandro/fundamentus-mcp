@@ -16,15 +16,14 @@ def register_page_tools(mcp: FastMCP, settings: Settings) -> None:
     """Register page scraping tools on the MCP server."""
 
     @mcp.tool
-    async def fetch_page(ctx: Context) -> str:
-        """Fetch the configured example page and return its document title."""
-        print("Inside fetch_page")
+    async def fetch_example_page(ctx: Context) -> str:
+        """Fetch an example page and return its document title (useful for connectivity checks)."""
         resources = cast(BrowserResources, ctx.lifespan_context)
         scraper = PageScraper(
             browser_context=resources["browser_context"],
             timeout_ms=settings.page_navigation_timeout_ms,
         )
-        return await scraper.fetch_title()
+        return await scraper.fetch_example_title()
 
     @mcp.tool
     async def get_relevant_facts(ctx: Context) -> str:
