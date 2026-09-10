@@ -19,6 +19,7 @@ The server exposes the following MCP tools:
   - Metrics: Dividend Yield (`divy`), P/VP (`pvp`), FFO Yield (`ffo_y`), Cap Rate (`cap_rate`), Vacancy Rate (`vacancia`), Market Cap (`mk_cap`), Price/m², Rent/m², Number of properties.
   - Categorization: Real estate segment (`segmento` - Logistics, Shopping, Corporate, etc.) and traded status (`negociada`).
 - `search_security`: Search companies, stocks, or FIIs by ticker symbol or partial name.
+- `get_major_shareholders`: Retrieve controlling groups, institutional investors, and shareholding percentages by share class for any listed company.
 - `search_properties`: Search physical properties held by FIIs with optional text query.
 - `get_relevant_facts`: Retrieve the latest relevant facts (*fatos relevantes*) with PDF report links.
 - `fetch_example_page`: Helper tool to fetch the title of an example page (verifies browser connectivity).

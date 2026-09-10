@@ -30,5 +30,15 @@ class SecurityMatch(TypedDict):
     legal_name: str
 
 
+class Shareholder(TypedDict):
+    name: str
+    percentage: str
+
+
+class ShareholderCategory(TypedDict):
+    category: str
+    shareholders: list[Shareholder]
+
+
 AdvancedSearchValue = str | int | float | bool | None
 AdvancedSearchFilters = dict[str, AdvancedSearchValue]

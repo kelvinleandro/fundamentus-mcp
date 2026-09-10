@@ -8,6 +8,7 @@ from app.scrapers.page_scraper import PageScraper
 from app.scrapers.relevant_facts import RelevantFactsScraper
 from app.scrapers.properties import PropertyScraper
 from app.scrapers.security_search import SecuritySearchScraper
+from app.scrapers.major_shareholders import MajorShareholdersScraper
 from app.scrapers.advanced_company_search import AdvancedCompanySearchScraper
 from app.scrapers.advanced_fii_search import AdvancedFIISearchScraper
 
@@ -140,6 +141,30 @@ def register_page_tools(mcp: FastMCP, settings: Settings) -> None:
             timeout_ms=settings.page_navigation_timeout_ms,
         )
         return await scraper.search(term)
+
+    @mcp.tool
+    async def get_major_shareholders(ctx: Context, ticker: str) -> str:
+        """Retrieve the major shareholders (principais acionistas) and their equity stakes.
+
+        Queries Fundamentus (principais_acionistas.php?papel=...) to obtain the
+        controlling groups, institutional investors, and substantial shareholding
+        breakdown for a Brazilian publicly traded company.
+
+        Parameters:
+            ticker: The stock ticker symbol of the company (e.g., "SANB3", "PETR4", "VALE3", "ITUB4").
+
+        Returns:
+            A formatted text block organized by share class (e.g., AÇÕES ORDINÁRIAS,
+            AÇÕES PREFERENCIAIS, CAPITAL TOTAL). Each section lists:
+            Acionista - Participação
+            {Nome do Acionista} - {Percentual}%
+        """
+        resources = cast(BrowserResources, ctx.lifespan_context)
+        scraper = MajorShareholdersScraper(
+            browser_context=resources["browser_context"],
+            timeout_ms=settings.page_navigation_timeout_ms,
+        )
+        return await scraper.fetch(ticker)
 
     @mcp.tool
     async def search_companies_advanced(
