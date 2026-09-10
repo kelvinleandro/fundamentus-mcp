@@ -17,7 +17,13 @@ def register_page_tools(mcp: FastMCP, settings: Settings) -> None:
 
     @mcp.tool
     async def fetch_example_page(ctx: Context) -> str:
-        """Fetch an example page and return its document title (useful for connectivity checks)."""
+        """Perform a browser health check by fetching an example page title.
+
+        Navigates to example.com using the shared Playwright CDP browser context
+        and returns the document title. Use this diagnostic tool to verify that
+        the CDP connection to Obscura/Chromium is healthy and responsive before
+        running deeper scraping tasks. Does not return financial data.
+        """
         resources = cast(BrowserResources, ctx.lifespan_context)
         scraper = PageScraper(
             browser_context=resources["browser_context"],
@@ -27,7 +33,22 @@ def register_page_tools(mcp: FastMCP, settings: Settings) -> None:
 
     @mcp.tool
     async def get_relevant_facts(ctx: Context) -> str:
-        """Return the latest Fundamentus relevant facts with PDF links."""
+        """Fetch the latest corporate relevant facts (Fatos Relevantes) from Fundamentus.
+
+        Retrieves recent official material disclosures and notices (FR) released
+        by publicly traded companies on B3.
+
+        Returns:
+            A formatted text block of announcements separated by '----'. Each entry
+            contains:
+            - Publication date, company name, and classification/ticker reference.
+            - Headline description of the material fact (e.g., dividends declaration,
+              M&A, quarterly earnings notice, restructuring).
+            - Direct download link to the original official PDF disclosure.
+
+        Best used when the user asks about recent corporate events, news, or regulatory
+        filings for Brazilian companies.
+        """
         resources = cast(BrowserResources, ctx.lifespan_context)
         scraper = PageScraper(
             browser_context=resources["browser_context"],
@@ -40,7 +61,26 @@ def register_page_tools(mcp: FastMCP, settings: Settings) -> None:
         ctx: Context,
         text: str | None = None,
     ) -> str:
-        """Search Fundamentus properties by text and return matching rows."""
+        """Search physical real estate properties held by Brazilian REITs (FIIs).
+
+        Queries the Fundamentus property catalog (fii_imoveis.php) for physical
+        assets owned by Real Estate Investment Trusts (Fundos de Tijolo).
+
+        Parameters:
+            text: Optional search query to filter properties. Can be:
+                - A FII ticker symbol (e.g., "HGLG11", "KNRI11", "XPLG11").
+                - A location, city, or state (e.g., "São Paulo", "SP", "Curitiba").
+                - A property name or asset type (e.g., "Galpão", "Centro Logístico", "Torre").
+                If omitted, returns the full catalog of available properties.
+
+        Returns:
+            A formatted text block of matching properties separated by '----'. Each entry
+            includes:
+            - FII ticker and property name.
+            - Full street address, city, and state.
+            - Additional characteristics (e.g., gross leasable area / ABL, number of units,
+              vacancy, or specialized infrastructure notes) when available.
+        """
         resources = cast(BrowserResources, ctx.lifespan_context)
         scraper = PropertyScraper(
             browser_context=resources["browser_context"],
@@ -50,7 +90,50 @@ def register_page_tools(mcp: FastMCP, settings: Settings) -> None:
 
     @mcp.tool
     async def search_security(ctx: Context, term: str) -> str:
-        """Search for an action, company, or FII by ticker or name."""
+        """Search for a Brazilian stock (company) or Real Estate Investment Trust (FII).
+
+        This is the primary tool for detailed asset profiles. It navigates to
+        Fundamentus's security details page (detalhes.php?papel=...) for the given term.
+
+        Behavior and return types:
+
+        1. Exact ticker match (e.g., "PETR4", "VALE3", "ITUB4", "HGLG11", "MXRF11"):
+           Navigates directly to the asset's page and returns a comprehensive, structured
+           JSON object with all fundamentals:
+
+           - For Companies / Stocks:
+             * "geral": Ticker, price, company name, sector, subsector, market cap,
+               firm value (EV), share count, and recent daily volume.
+             * "oscilacoes": Historical returns (Day, Month, 30 days, 12 months, and
+               prior calendar years).
+             * "indicadores_fundamentalistas": Key valuation and performance multiples:
+               P/L, P/VP, PSR, Dividend Yield, EV/EBIT, EV/EBITDA, ROE, ROIC, Margem
+               Bruta, Margem EBIT, Margem Líquida, Liquidez Corrente, Dív. Bruta/PL,
+               Giro Ativos, and 5-year revenue growth.
+             * "dados_balanco_patrimonial": Assets, cash/equivalents, gross debt, net
+               debt, and shareholders' equity.
+             * "dados_demonst_resultados": DRE segregated into "ultimos_12_meses" and
+               "ultimos_3_meses" (Net Revenue, EBIT, and Net Income).
+
+           - For FIIs (Real Estate Investment Trusts):
+             * "geral": FII ticker, quotation, fund name, mandate, segment, market cap,
+               and number of quotas.
+             * "oscilacoes": Return performance over day and month.
+             * "indicadores": FII multiples such as P/VP, FFO Yield, and Dividend Yield.
+             * "resultado": Revenue segregated into 12M and 3M.
+             * "balanco_patrimonial": Total assets and net worth.
+             * "imoveis": Portfolio metrics including number of properties, total area
+               in m² (ABL), and cap rate.
+
+        2. Ambiguous or partial name (e.g., "Petrobras", "Itau", "Logistica"):
+           Returns a formatted list of matching candidates with their tickers, commercial
+           names, and legal company names. Inspect the list and call `search_security`
+           again using the chosen specific ticker to retrieve the full JSON dataset.
+
+        Parameters:
+            term: Ticker symbol (preferred, e.g., "PETR4", "HGLG11") or search keyword
+                  (e.g., "Banco do Brasil").
+        """
         resources = cast(BrowserResources, ctx.lifespan_context)
         scraper = SecuritySearchScraper(
             browser_context=resources["browser_context"],

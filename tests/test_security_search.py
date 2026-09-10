@@ -1,4 +1,5 @@
 from unittest.mock import AsyncMock, MagicMock
+import json
 
 import pytest
 
@@ -30,6 +31,11 @@ TABLE_HTML = """
 
 CURRENT_SECURITY_HTML = """
 <div class="atual"><p>Você está vendo<strong>SANB3</strong></p></div>
+<table class="w728"><tr><td class="label">Papel</td><td class="data">SANB3</td></tr></table>
+<table class="w728"><tr><td class="label">Valor de mercado</td><td class="data">111</td></tr></table>
+<table class="w728"><tr><td class="nivel1">Oscilações</td></tr><tr><td>Dia</td><td>-1,00%</td><td>P/L</td><td>7,21</td></tr></table>
+<table class="w728"><tr><td class="nivel1">Dados Balanço Patrimonial</td></tr><tr><td>Ativo</td><td>100</td></tr></table>
+<table class="w728"><tr><td class="nivel1">Dados demonstrativos de resultados</td></tr><tr><td>Lucro Líquido</td><td>10</td><td>Lucro Líquido</td><td>3</td></tr></table>
 """
 
 
@@ -70,7 +76,16 @@ async def test_search_returns_current_security_paragraph() -> None:
 
     result = await scraper.search("SANB3")
 
-    assert result == "Você está vendo<strong>SANB3</strong>"
+    assert json.loads(result) == {
+      "geral": {"Papel": "SANB3", "Valor de mercado": "111"},
+      "oscilacoes": {"dia": "-1,00%"},
+      "indicadores_fundamentalistas": {"P/L": "7,21"},
+      "dados_balanco_patrimonial": {"Ativo": "100"},
+      "dados_demonst_resultados": {
+        "ultimos_12_meses": {"Lucro Líquido": "10"},
+        "ultimos_3_meses": {"Lucro Líquido": "3"},
+      },
+    }
     page.goto.assert_awaited_once_with(
         "https://www.fundamentus.com.br/detalhes.php?papel=SANB3",
         wait_until="domcontentloaded",
