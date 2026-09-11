@@ -1,6 +1,6 @@
 from urllib.parse import quote
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 from playwright.async_api import BrowserContext
 
 from app.models import Shareholder, ShareholderCategory
@@ -10,7 +10,7 @@ MAJOR_SHAREHOLDERS_URL = (
 )
 
 
-def _clean_text(element) -> str:
+def _clean_text(element: Tag) -> str:
     return " ".join(element.get_text(" ", strip=True).split())
 
 

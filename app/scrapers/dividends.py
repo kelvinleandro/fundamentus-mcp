@@ -1,6 +1,6 @@
 from urllib.parse import quote
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 from playwright.async_api import BrowserContext
 
 from app.models import CompanyDividend, FIIIncome
@@ -11,7 +11,7 @@ COMPANY_DIVIDENDS_URL = (
 FII_INCOME_URL = "https://www.fundamentus.com.br/fii_proventos.php?papel={}&tipo=2"
 
 
-def _clean_text(element) -> str:
+def _clean_text(element: Tag) -> str:
     return " ".join(element.get_text(" ", strip=True).split())
 
 

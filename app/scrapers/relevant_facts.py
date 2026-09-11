@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 
 from app.models import RelevantFact
+from app.scrapers.page_scraper import PageScraper
 from app.scrapers.html_utils import (
     cell_text,
     find_column,
@@ -79,7 +80,7 @@ def format_relevant_facts(facts: list[RelevantFact]) -> str:
 class RelevantFactsScraper:
     """Fetch and parse relevant facts from Fundamentus."""
 
-    def __init__(self, page_scraper) -> None:
+    def __init__(self, page_scraper: PageScraper) -> None:
         self._page_scraper = page_scraper
 
     async def fetch(self) -> str:

@@ -1,4 +1,4 @@
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 from playwright.async_api import BrowserContext
 
 from app.models import PropertyListing
@@ -7,7 +7,7 @@ from app.scrapers.html_utils import cell_text, find_column, link_text, normalize
 PROPERTIES_URL = "https://www.fundamentus.com.br/fii_imoveis.php"
 
 
-def _is_hidden(row) -> bool:
+def _is_hidden(row: Tag) -> bool:
     style = row.get("style", "").replace(" ", "").casefold()
     return row.has_attr("hidden") or "display:none" in style
 

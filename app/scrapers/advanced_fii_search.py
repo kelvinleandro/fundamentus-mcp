@@ -1,6 +1,7 @@
 from collections.abc import Mapping
 
 from bs4 import BeautifulSoup
+from playwright.async_api import BrowserContext
 
 SELECT_FIELDS = {"segmento"}
 CHECKBOX_FIELDS = {"negociada"}
@@ -52,7 +53,7 @@ class AdvancedFIISearchScraper:
     RESULT_URL_PATTERN = "**/fii_resultado.php"
     FORM_NAME = "formbusca"
 
-    def __init__(self, browser_context, timeout_ms: float) -> None:
+    def __init__(self, browser_context: BrowserContext, timeout_ms: float) -> None:
         self._browser_context = browser_context
         self._timeout_ms = timeout_ms
 

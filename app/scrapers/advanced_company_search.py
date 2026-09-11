@@ -1,6 +1,7 @@
 from collections.abc import Mapping
 
 from bs4 import BeautifulSoup
+from playwright.async_api import BrowserContext
 
 SELECT_FIELDS = {"setor", "ordem"}
 CHECKBOX_FIELDS = {"negociada", "ult_balanco_entregue"}
@@ -74,7 +75,7 @@ class AdvancedCompanySearchScraper:
     RESULT_URL_PATTERN = "**/resultado.php"
     FORM_NAME = "formbusca"
 
-    def __init__(self, browser_context, timeout_ms: float) -> None:
+    def __init__(self, browser_context: BrowserContext, timeout_ms: float) -> None:
         self._browser_context = browser_context
         self._timeout_ms = timeout_ms
 

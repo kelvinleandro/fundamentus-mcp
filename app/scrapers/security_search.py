@@ -1,7 +1,8 @@
+from collections.abc import Sequence
 import json
 from urllib.parse import quote
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 from playwright.async_api import BrowserContext
 
 from app.models import SecurityMatch
@@ -18,13 +19,13 @@ def _parse_current_security(html: str) -> str | None:
     return current_paragraph.decode_contents().strip()
 
 
-def _text(element) -> str:
+def _text(element: Tag) -> str:
     for help_element in element.select(".help.tips"):
         help_element.decompose()
     return " ".join(element.get_text(" ", strip=True).split())
 
 
-def _table_pairs(table, *, include_empty: bool = False) -> list[tuple[str, str]]:
+def _table_pairs(table: Tag, *, include_empty: bool = False) -> list[tuple[str, str]]:
     pairs = []
     for row in table.find_all("tr"):
         cells = row.find_all(["td", "th"])
@@ -43,13 +44,13 @@ def _table_pairs(table, *, include_empty: bool = False) -> list[tuple[str, str]]
     return pairs
 
 
-def _is_section_cell(cell, title: str) -> bool:
+def _is_section_cell(cell: Tag, title: str) -> bool:
     return title.casefold() in _text(cell).casefold() and any(
         class_name.startswith("nivel") for class_name in cell.get("class", [])
     )
 
 
-def _row_value_pairs(cells) -> list[tuple[str, str]]:
+def _row_value_pairs(cells: Sequence[Tag]) -> list[tuple[str, str]]:
     pairs = []
     for index in range(0, len(cells) - 1, 2):
         label = _text(cells[index])

@@ -1,7 +1,7 @@
 import json
 from urllib.parse import quote
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 from playwright.async_api import BrowserContext
 
 from app.models import FIIPropertyDetail
@@ -17,7 +17,7 @@ FII_PROPERTIES_URL = (
 )
 
 
-def _clean_numeric_percentage(cell) -> str:
+def _clean_numeric_percentage(cell: Tag) -> str:
     """Extract text from a cell while decomposing auxiliary interactive/chart icons."""
     for tag in list(cell.find_all(["a", "img", "svg"])):
         if tag.attrs is not None:

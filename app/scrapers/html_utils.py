@@ -1,5 +1,7 @@
 from collections.abc import Mapping
 
+from bs4 import Tag
+
 
 def normalize_header(value: str) -> str:
     return " ".join(value.casefold().split())
@@ -13,18 +15,18 @@ def find_column(headers: Mapping[str, int], *names: str) -> int:
     raise ValueError(f"Missing required table column: {', '.join(names)}")
 
 
-def cell_text(cell) -> str:
+def cell_text(cell: Tag) -> str:
     return " ".join(cell.get_text(" ", strip=True).split())
 
 
-def link_text(cell) -> str:
+def link_text(cell: Tag) -> str:
     link = cell.find("a")
     if link is None:
         return ""
     return " ".join(link.get_text(" ", strip=True).split())
 
 
-def link_href(cell) -> str:
+def link_href(cell: Tag) -> str:
     link = cell.find("a", href=True)
     if link is None:
         return ""
