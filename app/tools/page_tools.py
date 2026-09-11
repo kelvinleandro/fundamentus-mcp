@@ -11,6 +11,7 @@ from app.scrapers.security_search import SecuritySearchScraper
 from app.scrapers.major_shareholders import MajorShareholdersScraper
 from app.scrapers.dividends import CompanyDividendsScraper, FIIIncomeScraper
 from app.scrapers.fii_properties import FIIPropertiesScraper
+from app.scrapers.fii_administrator import FIIAdministratorScraper
 from app.scrapers.advanced_company_search import AdvancedCompanySearchScraper
 from app.scrapers.advanced_fii_search import AdvancedFIISearchScraper
 
@@ -249,6 +250,30 @@ def register_page_tools(mcp: FastMCP, settings: Settings) -> None:
         """
         resources = cast(BrowserResources, ctx.lifespan_context)
         scraper = FIIPropertiesScraper(
+            browser_context=resources["browser_context"],
+            timeout_ms=settings.page_navigation_timeout_ms,
+        )
+        return await scraper.fetch(ticker)
+
+    @mcp.tool
+    async def get_fii_administrator(ctx: Context, ticker: str) -> str:
+        """Retrieve fund administrator info, contact details, fee rates, and remuneration policy for a FII in JSON format.
+
+        Queries Fundamentus (fii_administrador.php?papel=...) to get the governance,
+        administrative contacts, fund CNPJ, management fee rates (Tx administração
+        sobre PL e Valor de Mercado), and full remuneration policy text.
+
+        Parameters:
+            ticker: The FII ticker symbol (e.g., "AIEC11", "HGLG11", "KNRI11", "XPML11").
+
+        Returns:
+            A JSON string with the following structure:
+            - administracao: Dictionary containing administrator name, Fund CNPJ, Administrator
+              CNPJ, telephone, email, website, and administration fee percentages.
+            - politica_remuneracao: Full descriptive text of the fund's remuneration policy.
+        """
+        resources = cast(BrowserResources, ctx.lifespan_context)
+        scraper = FIIAdministratorScraper(
             browser_context=resources["browser_context"],
             timeout_ms=settings.page_navigation_timeout_ms,
         )

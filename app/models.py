@@ -66,5 +66,10 @@ class FIIPropertyDetail(TypedDict):
     participacao_receitas: str
 
 
+class FIIAdministratorDetails(TypedDict):
+    administracao: dict[str, str]
+    politica_remuneracao: str
+
+
 AdvancedSearchValue = str | int | float | bool | None
 AdvancedSearchFilters = dict[str, AdvancedSearchValue]
