@@ -10,6 +10,7 @@ from app.scrapers.properties import PropertyScraper
 from app.scrapers.security_search import SecuritySearchScraper
 from app.scrapers.major_shareholders import MajorShareholdersScraper
 from app.scrapers.dividends import CompanyDividendsScraper, FIIIncomeScraper
+from app.scrapers.fii_properties import FIIPropertiesScraper
 from app.scrapers.advanced_company_search import AdvancedCompanySearchScraper
 from app.scrapers.advanced_fii_search import AdvancedFIISearchScraper
 
@@ -224,6 +225,34 @@ def register_page_tools(mcp: FastMCP, settings: Settings) -> None:
             timeout_ms=settings.page_navigation_timeout_ms,
         )
         return await scraper.fetch(ticker, last_n=last_n)
+
+    @mcp.tool
+    async def get_fii_properties(ctx: Context, ticker: str) -> str:
+        """Retrieve physical properties held by a specific Real Estate Investment Trust (FII) in JSON format.
+
+        Queries Fundamentus (fii_imoveis_detalhes.php?papel=...) to get the portfolio
+        breakdown of physical assets owned by an equity FII (Fundo de Tijolo).
+
+        Parameters:
+            ticker: The FII ticker symbol (e.g., "AIEC11", "HGLG11", "KNRI11", "XPML11").
+
+        Returns:
+            A JSON string representing a list of property objects with the following fields:
+            - imovel: Name of the property or building.
+            - endereco: Street address, city, and state.
+            - area: Gross Leasable Area (ABL / Área in m²).
+            - num_unidades: Number of units in the property.
+            - caracteristicas: Building type / segment (e.g. Shopping Center, Galpão Logístico, Lajes Corporativas).
+            - taxa_ocupacao: Physical occupancy rate percentage (e.g. "98,50%").
+            - inadimplencia: Default/delinquency rate percentage (e.g. "1,91%").
+            - participacao_receitas: Share of total fund revenues (e.g. "97,94%").
+        """
+        resources = cast(BrowserResources, ctx.lifespan_context)
+        scraper = FIIPropertiesScraper(
+            browser_context=resources["browser_context"],
+            timeout_ms=settings.page_navigation_timeout_ms,
+        )
+        return await scraper.fetch(ticker)
 
     @mcp.tool
     async def search_companies_advanced(

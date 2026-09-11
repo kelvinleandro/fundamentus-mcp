@@ -21,6 +21,7 @@ The server exposes the following MCP tools:
 - `search_security`: Search companies, stocks, or FIIs by ticker symbol or partial name.
 - `get_company_dividends`: Retrieve historical dividends and interest on equity (JCP) payouts for a company with an optional `last_n` limit.
 - `get_fii_income_history`: Retrieve historical monthly income distributions (rendimentos) for a FII with an optional `last_n` limit.
+- `get_fii_properties`: Retrieve physical properties owned by a specific FII (address, area, occupancy rate, delinquency, revenue share) as structured JSON.
 - `get_major_shareholders`: Retrieve controlling groups, institutional investors, and shareholding percentages by share class for any listed company.
 - `search_properties`: Search physical properties held by FIIs with optional text query.
 - `get_relevant_facts`: Retrieve the latest relevant facts (*fatos relevantes*) with PDF report links.

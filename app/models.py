@@ -55,5 +55,16 @@ class FIIIncome(TypedDict):
     value: str
 
 
+class FIIPropertyDetail(TypedDict):
+    imovel: str
+    endereco: str
+    area: str
+    num_unidades: str
+    caracteristicas: str
+    taxa_ocupacao: str
+    inadimplencia: str
+    participacao_receitas: str
+
+
 AdvancedSearchValue = str | int | float | bool | None
 AdvancedSearchFilters = dict[str, AdvancedSearchValue]
