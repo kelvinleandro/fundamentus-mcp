@@ -40,5 +40,20 @@ class ShareholderCategory(TypedDict):
     shareholders: list[Shareholder]
 
 
+class CompanyDividend(TypedDict):
+    date: str
+    value: str
+    type: str
+    payment_date: str
+    share_count: str
+
+
+class FIIIncome(TypedDict):
+    last_date_with: str
+    type: str
+    payment_date: str
+    value: str
+
+
 AdvancedSearchValue = str | int | float | bool | None
 AdvancedSearchFilters = dict[str, AdvancedSearchValue]

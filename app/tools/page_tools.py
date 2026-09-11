@@ -9,6 +9,7 @@ from app.scrapers.relevant_facts import RelevantFactsScraper
 from app.scrapers.properties import PropertyScraper
 from app.scrapers.security_search import SecuritySearchScraper
 from app.scrapers.major_shareholders import MajorShareholdersScraper
+from app.scrapers.dividends import CompanyDividendsScraper, FIIIncomeScraper
 from app.scrapers.advanced_company_search import AdvancedCompanySearchScraper
 from app.scrapers.advanced_fii_search import AdvancedFIISearchScraper
 
@@ -165,6 +166,64 @@ def register_page_tools(mcp: FastMCP, settings: Settings) -> None:
             timeout_ms=settings.page_navigation_timeout_ms,
         )
         return await scraper.fetch(ticker)
+
+    @mcp.tool
+    async def get_company_dividends(
+        ctx: Context,
+        ticker: str,
+        last_n: int | None = None,
+    ) -> str:
+        """Retrieve historical dividend and interest on equity (JCP) payouts for a stock.
+
+        Queries Fundamentus (proventos.php?papel=...&tipo=2) to obtain corporate cash
+        distributions declared by a listed Brazilian company.
+
+        Parameters:
+            ticker: The stock ticker symbol (e.g., "PETR4", "VALE3", "BBAS3", "ITUB4").
+            last_n: Optional integer specifying the number of most recent payouts to return.
+                    If omitted or None, returns all historical payout records.
+
+        Returns:
+            A formatted text block with columns:
+            PROVENTOS
+            Data - Valor - Tipo - Data de Pagamento - Por quantas ações
+            {Data com} - {Valor em R$} - {Tipo (DIVIDENDO / JRS CAP PROPRIO)} - {Data de Pagamento} - {Qtd Ações}
+        """
+        resources = cast(BrowserResources, ctx.lifespan_context)
+        scraper = CompanyDividendsScraper(
+            browser_context=resources["browser_context"],
+            timeout_ms=settings.page_navigation_timeout_ms,
+        )
+        return await scraper.fetch(ticker, last_n=last_n)
+
+    @mcp.tool
+    async def get_fii_income_history(
+        ctx: Context,
+        ticker: str,
+        last_n: int | None = None,
+    ) -> str:
+        """Retrieve historical monthly income distributions (rendimentos) for a Real Estate Investment Trust (FII).
+
+        Queries Fundamentus (fii_proventos.php?papel=...&tipo=2) to obtain distribution history
+        for a Brazilian FII.
+
+        Parameters:
+            ticker: The FII ticker symbol (e.g., "HGLG11", "MXRF11", "XPML11", "KNIP11").
+            last_n: Optional integer specifying the number of most recent distributions to return.
+                    If omitted or None, returns all historical income records.
+
+        Returns:
+            A formatted text block with columns:
+            PROVENTOS
+            Última Data Com - Tipo - Data de Pagamento - Valor
+            {Data com} - {Tipo} - {Data de Pagamento} - {Valor em R$}
+        """
+        resources = cast(BrowserResources, ctx.lifespan_context)
+        scraper = FIIIncomeScraper(
+            browser_context=resources["browser_context"],
+            timeout_ms=settings.page_navigation_timeout_ms,
+        )
+        return await scraper.fetch(ticker, last_n=last_n)
 
     @mcp.tool
     async def search_companies_advanced(
