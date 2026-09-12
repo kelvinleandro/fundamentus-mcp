@@ -366,9 +366,10 @@ def register_page_tools(mcp: FastMCP, settings: Settings) -> None:
         {"negociada": True, "ult_balanco_entregue": True, "ordem": "15"}
         ```
 
-        The return value is the number of companies matching the filters as a
-        string. Unknown field names are rejected. The advanced search form
-        uses `.` as the decimal separator.
+        The return value is a formatted JSON string containing an array of company
+        objects matching the filters (including price, multiples, margins, ROIC/ROE,
+        and liquidity metrics). Unknown field names are rejected. The advanced
+        search form uses `.` as the decimal separator.
         """
         resources = cast(BrowserResources, ctx.lifespan_context)
         scraper = AdvancedCompanySearchScraper(
@@ -427,8 +428,9 @@ def register_page_tools(mcp: FastMCP, settings: Settings) -> None:
         {"cap_rate_min": 0.07, "vacancia_max": 0.10, "segmento": "6"}
         ```
 
-        The return value is the number of FIIs matching the filters as a
-        string. Unknown field names are rejected.
+        The return value is a formatted JSON string containing an array of FII
+        objects matching the filters (including ticker, segment, quotation, yields,
+        multiples, and portfolio metrics). Unknown field names are rejected.
         """
         resources = cast(BrowserResources, ctx.lifespan_context)
         scraper = AdvancedFIISearchScraper(

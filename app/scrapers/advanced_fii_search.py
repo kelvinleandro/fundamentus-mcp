@@ -1,4 +1,5 @@
 from collections.abc import Mapping
+import json
 
 from bs4 import BeautifulSoup
 from playwright.async_api import BrowserContext
@@ -14,6 +15,54 @@ def count_result_rows(html: str) -> int:
     if table is None:
         raise ValueError("Table with id 'tabelaResultado' was not found")
     return sum(1 for row in table.find_all("tr") if row.find("td") is not None)
+
+
+def parse_fii_search_results(html: str) -> list[dict[str, str]]:
+    """Parse FII rows from the advanced search result table into dictionaries."""
+    soup = BeautifulSoup(html, "html.parser")
+    table = soup.find("table", id="tabelaResultado") or soup.find("table", id="resultado")
+    if table is None:
+        return []
+
+    thead = table.find("thead")
+    headers: list[str] = []
+    valid_indices: list[int] = []
+    if thead:
+        header_row = thead.find("tr")
+        if header_row:
+            raw_ths = header_row.find_all(["th", "td"])
+            for idx, th in enumerate(raw_ths):
+                name = " ".join(th.get_text(" ", strip=True).split())
+                style = th.get("style", "").lower()
+                # Omit hidden columns like Endereço which are not visually displayed
+                if "display: none" in style or "display:none" in style or name.lower() == "endereço":
+                    continue
+                valid_indices.append(idx)
+                headers.append(name)
+
+    results: list[dict[str, str]] = []
+    tbody = table.find("tbody") or table
+    for row in tbody.find_all("tr"):
+        cells = row.find_all("td")
+        if not cells:
+            continue
+
+        row_data: dict[str, str] = {}
+        if valid_indices and len(valid_indices) == len(headers):
+            for header, idx in zip(headers, valid_indices):
+                if idx < len(cells):
+                    row_data[header] = " ".join(cells[idx].get_text(" ", strip=True).split())
+        else:
+            for index, cell in enumerate(cells):
+                header = headers[index] if index < len(headers) else f"col_{index}"
+                if header.lower() == "endereço":
+                    continue
+                row_data[header] = " ".join(cell.get_text(" ", strip=True).split())
+
+        if row_data:
+            results.append(row_data)
+
+    return results
 
 
 def validate_fii_filters(filters: Mapping[str, object]) -> None:
@@ -114,6 +163,10 @@ class AdvancedFIISearchScraper:
             )
 
             html = await page.content()
-            return str(count_result_rows(html))
+            return json.dumps(
+                parse_fii_search_results(html),
+                ensure_ascii=False,
+                indent=2,
+            )
         finally:
             await page.close()

@@ -1,4 +1,5 @@
 from collections.abc import Mapping
+import json
 
 from bs4 import BeautifulSoup
 from playwright.async_api import BrowserContext
@@ -14,6 +15,41 @@ def count_result_rows(html: str) -> int:
     if table is None:
         raise ValueError("Table with id 'resultado' was not found")
     return sum(1 for row in table.find_all("tr") if row.find("td") is not None)
+
+
+def parse_company_search_results(html: str) -> list[dict[str, str]]:
+    """Parse company rows from the advanced search result table into dictionaries."""
+    soup = BeautifulSoup(html, "html.parser")
+    table = soup.find("table", id="resultado")
+    if table is None:
+        return []
+
+    thead = table.find("thead")
+    headers: list[str] = []
+    if thead:
+        header_row = thead.find("tr")
+        if header_row:
+            headers = [
+                " ".join(th.get_text(" ", strip=True).split())
+                for th in header_row.find_all(["th", "td"])
+            ]
+
+    results: list[dict[str, str]] = []
+    tbody = table.find("tbody") or table
+    for row in tbody.find_all("tr"):
+        cells = row.find_all("td")
+        if not cells:
+            continue
+
+        row_data: dict[str, str] = {}
+        for index, cell in enumerate(cells):
+            header = headers[index] if index < len(headers) else f"col_{index}"
+            row_data[header] = " ".join(cell.get_text(" ", strip=True).split())
+
+        if row_data:
+            results.append(row_data)
+
+    return results
 
 
 def validate_advanced_filters(filters: Mapping[str, object]) -> None:
@@ -135,6 +171,10 @@ class AdvancedCompanySearchScraper:
             )
 
             html = await page.content()
-            return str(count_result_rows(html))
+            return json.dumps(
+                parse_company_search_results(html),
+                ensure_ascii=False,
+                indent=2,
+            )
         finally:
             await page.close()

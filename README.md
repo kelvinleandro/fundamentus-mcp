@@ -10,12 +10,12 @@ Built with **Python 3.12+**, **FastMCP**, **Playwright**, and designed to connec
 
 The server exposes the following MCP tools:
 
-- `search_companies_advanced`: Advanced fundamental screening for B3 stocks with multi-criteria filters:
+- `search_companies_advanced`: Advanced fundamental screening for B3 stocks returning structured JSON with multi-criteria filters:
   - Valuation & Multiples: P/L (`pl_min`/`pl_max`), P/VP (`pvp_min`/`pvp_max`), PSR, EV/EBIT, EV/EBITDA, P/Ativos.
   - Returns & Margins: Dividend Yield (`divy`), ROIC, ROE, EBIT Margin, Net Margin.
   - Health & Liquidity: Current Liquidity (`liqcorr`), Net Debt / Equity (`divliquida`), Net Equity (`patrim`).
   - Sector & Status: Sector filter (`setor`), share liquidity, traded in the last 2 months (`negociada`), latest balance sheet submitted (`ult_balanco_entregue`).
-- `search_fii_advanced`: Advanced fundamental screening for Real Estate Investment Trusts (FIIs):
+- `search_fii_advanced`: Advanced fundamental screening for Real Estate Investment Trusts (FIIs) returning structured JSON:
   - Metrics: Dividend Yield (`divy`), P/VP (`pvp`), FFO Yield (`ffo_y`), Cap Rate (`cap_rate`), Vacancy Rate (`vacancia`), Market Cap (`mk_cap`), Price/m², Rent/m², Number of properties.
   - Categorization: Real estate segment (`segmento` - Logistics, Shopping, Corporate, etc.) and traded status (`negociada`).
 - `search_security`: Search companies, stocks, or FIIs by ticker symbol or partial name.
