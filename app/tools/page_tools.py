@@ -19,7 +19,7 @@ from app.scrapers.advanced_fii_search import AdvancedFIISearchScraper
 def register_page_tools(mcp: FastMCP, settings: Settings) -> None:
     """Register page scraping tools on the MCP server."""
 
-    @mcp.tool
+    @mcp.tool(tags={"diagnostics", "health"})
     async def fetch_example_page(ctx: Context) -> str:
         """Perform a browser health check by fetching an example page title.
 
@@ -35,7 +35,7 @@ def register_page_tools(mcp: FastMCP, settings: Settings) -> None:
         )
         return await scraper.fetch_example_title()
 
-    @mcp.tool
+    @mcp.tool(tags={"stocks", "news"})
     async def get_relevant_facts(ctx: Context) -> str:
         """Fetch the latest corporate relevant facts (Fatos Relevantes) from Fundamentus.
 
@@ -60,7 +60,7 @@ def register_page_tools(mcp: FastMCP, settings: Settings) -> None:
         )
         return await RelevantFactsScraper(scraper).fetch()
 
-    @mcp.tool
+    @mcp.tool(tags={"fii", "real-estate"})
     async def search_properties(
         ctx: Context,
         text: str | None = None,
@@ -92,7 +92,7 @@ def register_page_tools(mcp: FastMCP, settings: Settings) -> None:
         )
         return await scraper.search(text)
 
-    @mcp.tool
+    @mcp.tool(tags={"search", "stocks", "fii", "fundamentals"})
     async def search_security(ctx: Context, term: str) -> str:
         """Search for a Brazilian stock (company) or Real Estate Investment Trust (FII).
 
@@ -145,7 +145,7 @@ def register_page_tools(mcp: FastMCP, settings: Settings) -> None:
         )
         return await scraper.search(term)
 
-    @mcp.tool
+    @mcp.tool(tags={"stocks", "governance"})
     async def get_major_shareholders(ctx: Context, ticker: str) -> str:
         """Retrieve the major shareholders (principais acionistas) and their equity stakes.
 
@@ -169,7 +169,7 @@ def register_page_tools(mcp: FastMCP, settings: Settings) -> None:
         )
         return await scraper.fetch(ticker)
 
-    @mcp.tool
+    @mcp.tool(tags={"stocks", "dividends"})
     async def get_company_dividends(
         ctx: Context,
         ticker: str,
@@ -198,7 +198,7 @@ def register_page_tools(mcp: FastMCP, settings: Settings) -> None:
         )
         return await scraper.fetch(ticker, last_n=last_n)
 
-    @mcp.tool
+    @mcp.tool(tags={"fii", "dividends"})
     async def get_fii_income_history(
         ctx: Context,
         ticker: str,
@@ -227,7 +227,7 @@ def register_page_tools(mcp: FastMCP, settings: Settings) -> None:
         )
         return await scraper.fetch(ticker, last_n=last_n)
 
-    @mcp.tool
+    @mcp.tool(tags={"fii", "real-estate"})
     async def get_fii_properties(ctx: Context, ticker: str) -> str:
         """Retrieve physical properties held by a specific Real Estate Investment Trust (FII) in JSON format.
 
@@ -255,7 +255,7 @@ def register_page_tools(mcp: FastMCP, settings: Settings) -> None:
         )
         return await scraper.fetch(ticker)
 
-    @mcp.tool
+    @mcp.tool(tags={"fii", "governance"})
     async def get_fii_administrator(ctx: Context, ticker: str) -> str:
         """Retrieve fund administrator info, contact details, fee rates, and remuneration policy for a FII in JSON format.
 
@@ -279,7 +279,7 @@ def register_page_tools(mcp: FastMCP, settings: Settings) -> None:
         )
         return await scraper.fetch(ticker)
 
-    @mcp.tool
+    @mcp.tool(tags={"stocks", "screener", "fundamentals"})
     async def search_companies_advanced(
         ctx: Context,
         filters: AdvancedSearchFilters,
@@ -378,7 +378,7 @@ def register_page_tools(mcp: FastMCP, settings: Settings) -> None:
         )
         return await scraper.search(filters)
 
-    @mcp.tool
+    @mcp.tool(tags={"fii", "screener", "fundamentals"})
     async def search_fii_advanced(
         ctx: Context,
         filters: AdvancedSearchFilters,
